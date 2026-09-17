@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Log in to your Larb Koi Soi Ju account.">
+  <title>Log in | Larb Koi Soi Ju</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="register-page">
+  <header class="site-header register-header">
+    <a class="brand" href="index.html" aria-label="Larb Koi Soi Ju home">Larb Koi Soi Ju<span class="brand-dot">.</span></a>
+    <a class="header-button" href="index.html">Back to cafe <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main class="register-main">
+    <section class="register-intro" aria-labelledby="login-title">
+      <p class="eyebrow">Welcome back</p>
+      <h1 id="login-title">Good to<br><em>see you.</em></h1>
+      <p>Log in to manage your details, keep up with special dinners, and save your favourite Larb Koi moments.</p>
+      <p class="register-note">Your table is waiting.</p>
+    </section>
+
+    <section class="register-panel" aria-label="Login form">
+      <form id="login-form" action="index.html" method="get">
+        <div class="form-field">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="text" autocomplete="email" required>
+        </div>
+        <div class="form-field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <div class="login-options">
+          <label class="checkbox-field" for="remember">
+            <input id="remember" name="remember" type="checkbox">
+            <span>Remember me</span>
+          </label>
+          <a href="mailto:hello@larbkoisoi.ju?subject=Password%20reset">Forgot password?</a>
+        </div>
+        <button class="form-button" type="submit">Log in <span aria-hidden="true">↗</span></button>
+        <p class="form-footnote">New to Larb Koi Soi Ju? Ask us in the cafe to set up an account.</p>
+        <p class="form-error" id="form-error" role="alert" hidden>Enter an email and password to continue.</p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2024 Larb Koi Soi Ju</p>
+    <p>Market Street &amp; Soi 7 · Open daily</p>
+    <a href="index.html">Back to cafe ↑</a>
+  </footer>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', function (event) {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const error = document.getElementById('form-error');
+
+      if (!email || !password) {
+        event.preventDefault();
+        error.hidden = false;
+        return;
+      }
+
+      error.hidden = true;
+    });
+  </script>
+</body>
+</html>
