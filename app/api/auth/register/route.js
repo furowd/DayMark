@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { withApiErrors } from "../../../../lib/api-response.js";
 import { registerUser } from "../../../../lib/auth.js";
 
-export async function POST(request) {
+export const POST = withApiErrors(async (request) => {
   let body;
   try {
     body = await request.json();
@@ -11,4 +12,4 @@ export async function POST(request) {
   const result = await registerUser(body?.username, body?.password);
   if (result.error) return NextResponse.json({ error: result.error }, { status: result.status });
   return NextResponse.json({ user: result.user }, { status: 201 });
-}
+});

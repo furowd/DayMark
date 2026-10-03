@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { withApiErrors } from "../../../lib/api-response.js";
 import { getCookieToken, getSessionUser } from "../../../lib/auth.js";
 import { addTask, listTasks } from "../../../lib/tasks.js";
 
@@ -6,13 +7,13 @@ async function currentUser(request) {
   return getSessionUser(getCookieToken(request));
 }
 
-export async function GET(request) {
+export const GET = withApiErrors(async (request) => {
   const user = await currentUser(request);
   if (!user) return NextResponse.json({ error: "Please log in to continue." }, { status: 401 });
   return NextResponse.json({ user: { username: user.username }, tasks: await listTasks(user.id) });
-}
+});
 
-export async function POST(request) {
+export const POST = withApiErrors(async (request) => {
   const user = await currentUser(request);
   if (!user) return NextResponse.json({ error: "Please log in to continue." }, { status: 401 });
   let body;
@@ -24,4 +25,4 @@ export async function POST(request) {
   const result = await addTask(user.id, body?.text);
   if (result.error) return NextResponse.json({ error: result.error }, { status: 400 });
   return NextResponse.json({ task: result.task }, { status: 201 });
-}
+});

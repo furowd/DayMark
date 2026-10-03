@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { withApiErrors } from "../../../../lib/api-response.js";
 import { authenticateUser, createSession, SESSION_COOKIE } from "../../../../lib/auth.js";
 
-export async function POST(request) {
+export const POST = withApiErrors(async (request) => {
   let body;
   try {
     body = await request.json();
@@ -22,4 +23,4 @@ export async function POST(request) {
     expires: new Date(session.expiresAt),
   });
   return response;
-}
+});

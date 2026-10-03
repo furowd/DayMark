@@ -2,6 +2,18 @@
 
 import { useEffect, useState } from "react";
 
+async function readApiResponse(response) {
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    return { error: `Server returned an unexpected response (${response.status}). Check Vercel function logs and database settings.` };
+  }
+  try {
+    return await response.json();
+  } catch {
+    return { error: "The server returned an invalid response. Check Vercel function logs." };
+  }
+}
+
 export default function HomePage() {
   const [user, setUser] = useState(null);
   const [tasks, setTasks] = useState([]);
@@ -25,8 +37,11 @@ export default function HomePage() {
     let active = true;
     fetch("/api/tasks")
       .then(async (response) => {
-        if (!response.ok) return;
-        const data = await response.json();
+        const data = await readApiResponse(response);
+        if (!response.ok) {
+          if (response.status >= 500 && active) setError(data.error || "The server is temporarily unavailable.");
+          return;
+        }
         if (active) {
           setTasks(data.tasks);
           setUser(data.user);
@@ -48,7 +63,7 @@ export default function HomePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-      const data = await response.json();
+      const data = await readApiResponse(response);
       if (!response.ok) throw new Error(data.error || "Something went wrong.");
       if (view === "register") {
         setView("login");
@@ -73,7 +88,7 @@ export default function HomePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: taskText }),
     });
-    const data = await response.json();
+    const data = await readApiResponse(response);
     if (!response.ok) return setError(data.error || "Could not add task.");
     setTasks((current) => [data.task, ...current]);
     setTaskText("");
@@ -86,7 +101,7 @@ export default function HomePage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ completed: !task.completed }),
     });
-    const data = await response.json();
+    const data = await readApiResponse(response);
     if (!response.ok) return setError(data.error || "Could not update task.");
     setTasks((current) => current.map((item) => item.id === task.id ? data.task : item)
       .sort((a, b) => Number(a.completed) - Number(b.completed)));
@@ -95,7 +110,7 @@ export default function HomePage() {
   async function deleteTask(taskId) {
     setError("");
     const response = await fetch(`/api/tasks/${taskId}`, { method: "DELETE" });
-    const data = await response.json();
+    const data = await readApiResponse(response);
     if (!response.ok) return setError(data.error || "Could not delete task.");
     setTasks((current) => current.filter((task) => task.id !== taskId));
   }

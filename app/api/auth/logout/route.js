@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { withApiErrors } from "../../../../lib/api-response.js";
 import { deleteSession, getCookieToken, SESSION_COOKIE } from "../../../../lib/auth.js";
 
-export async function POST(request) {
+export const POST = withApiErrors(async (request) => {
   await deleteSession(getCookieToken(request));
   const response = NextResponse.json({ ok: true });
   response.cookies.set(SESSION_COOKIE, "", {
@@ -12,4 +13,4 @@ export async function POST(request) {
     maxAge: 0,
   });
   return response;
-}
+});

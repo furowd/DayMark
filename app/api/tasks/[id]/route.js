@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { withApiErrors } from "../../../../lib/api-response.js";
 import { getCookieToken, getSessionUser } from "../../../../lib/auth.js";
 import { removeTask, setTaskCompleted } from "../../../../lib/tasks.js";
 
@@ -12,7 +13,7 @@ async function taskContext(request, context) {
   return { user, id: Number(id) };
 }
 
-export async function PATCH(request, context) {
+export const PATCH = withApiErrors(async (request, context) => {
   const state = await taskContext(request, context);
   if (state.response) return state.response;
   let body;
@@ -24,12 +25,12 @@ export async function PATCH(request, context) {
   const result = await setTaskCompleted(state.user.id, state.id, body?.completed);
   if (result.error) return NextResponse.json({ error: result.error }, { status: result.status || 400 });
   return NextResponse.json({ task: result.task });
-}
+});
 
-export async function DELETE(request, context) {
+export const DELETE = withApiErrors(async (request, context) => {
   const state = await taskContext(request, context);
   if (state.response) return state.response;
   const deleted = await removeTask(state.user.id, state.id);
   if (!deleted) return NextResponse.json({ error: "Task not found." }, { status: 404 });
   return NextResponse.json({ ok: true });
-}
+});
